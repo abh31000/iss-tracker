@@ -1,5 +1,12 @@
+import Globe from "./components/Globe";
+import globeData from './assets/custom.geo.json'
+
+
 export default function App() {
    return (
-      <h1 className='text-3xl font-bold underline'> Hello world! </h1>
+      <>
+         <Globe data={globeData}></Globe>
+      </>
+      
    );
 }
