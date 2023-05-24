@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.graticule {
+    fill: lightblue;
+    stroke: black;
+    stroke-width: 1px;
+}
