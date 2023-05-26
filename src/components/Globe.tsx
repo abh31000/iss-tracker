@@ -11,14 +11,30 @@ const client = axios.create({
 
 export default function Globe({data}:any): React.JSX.Element{
     const [rotation, setRotation] = useState(0)
+    const [issData, setIssData] = useState<any>()
     const svgRef:any = useRef(null)
     const projection:any = d3.geoOrthographic()
     const sensitivity = 75
     const issCord:any = [-14.599413, -28.673147]
+    //const [issLat, setIssLat] = useState()
+    //const [issLong, setIssLong] = useState()
+    const [issCords, setIssCords] = useState<[number, number]>([0,0])
+
+    function getIssData() {
+        client.get("/")
+            .then((res) => {
+                //console.log(res.data['latitude'], res.data['longitude'])
+                setIssCords([res.data['longitude'], res.data['latitude']])
+                setIssData(res.data)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+
 
     useEffect(()=>{
         const svg = d3.select(svgRef.current).append("svg")
-        
 
         const globe = svg.append("circle")
             .attr("fill", "#DDDDDD")
@@ -28,15 +44,16 @@ export default function Globe({data}:any): React.JSX.Element{
             .attr("cy", 330)
             .attr('r',300)
         
+            
         
         function updatePP(){
             //const rot = projection.rotate()
-            const [x, y]:any = projection(issCord)
+            const [x, y]:any = projection(issCords)
 
 
             //console.log(pathGenerator.bounds())
             const circleGenerator = d3.geoCircle()
-                .center(issCord)
+                .center(issCords)
                 .radius(3)
             
             const circle = circleGenerator()
@@ -63,7 +80,8 @@ export default function Globe({data}:any): React.JSX.Element{
 
         projection.translate([400,330])
         projection.scale(300)
-        let pathGenerator:any = geoPath(projection)
+        projection.rotate([-150,0,0])
+        const pathGenerator:any = geoPath(projection)
         svg.selectAll("path").attr("d", pathGenerator)
 
         // Drawing the globe        
@@ -81,7 +99,7 @@ export default function Globe({data}:any): React.JSX.Element{
             .style("opacity",0.6)
             
 
-            d3.timer(function(elapsed) {
+            /*d3.timer(function(elapsed) {
                 const rotate = projection.rotate()
                 const k = sensitivity / projection.scale()
                 projection.rotate([
@@ -90,8 +108,11 @@ export default function Globe({data}:any): React.JSX.Element{
                 ])
                 pathGenerator = d3.geoPath(projection)
                 svg.selectAll("path").attr("d", pathGenerator)
-              },200)
-        
+              },200)*/
+              
+              const timer = setInterval(() => { getIssData()}, 1000)
+              console.log(issCords)
+              return () => clearInterval(timer)
 
     },[data, projection, rotation])
 
