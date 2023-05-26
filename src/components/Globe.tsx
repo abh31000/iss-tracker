@@ -11,11 +11,11 @@ const client = axios.create({
 
 export default function Globe({data}:any): React.JSX.Element{
     const [rotation, setRotation] = useState(0)
-    const [issData, setIssData] = useState<any>()
+    //const [issData, setIssData] = useState<any>()
     const svgRef:any = useRef(null)
     const projection:any = d3.geoOrthographic()
     const sensitivity = 75
-    const issCord:any = [-14.599413, -28.673147]
+    //const issCord:any = [-14.599413, -28.673147]
     //const [issLat, setIssLat] = useState()
     //const [issLong, setIssLong] = useState()
     const [issCords, setIssCords] = useState<[number, number]>([0,0])
@@ -34,7 +34,8 @@ export default function Globe({data}:any): React.JSX.Element{
 
 
     useEffect(()=>{
-        const svg = d3.select(svgRef.current).append("svg")
+        const svg = d3.select(svgRef.current)
+        svg.selectAll("*").remove()
 
         const globe = svg.append("circle")
             .attr("fill", "#DDDDDD")
@@ -58,7 +59,7 @@ export default function Globe({data}:any): React.JSX.Element{
             
             const circle = circleGenerator()
             const draw_circle = pathGenerator(circle)
-            svg.select("#red-dot").remove()
+            
             
 
             
@@ -72,9 +73,10 @@ export default function Globe({data}:any): React.JSX.Element{
                 .attr('fill', 'red')
             }
         }
+       
 
         d3.timer(updatePP)
-
+        svg.select("#red-dot").remove()
         
         //const map = svg.append("g")
 
@@ -100,6 +102,7 @@ export default function Globe({data}:any): React.JSX.Element{
             .style('stroke-width', 0.5)
             .style("opacity",0.6)
             
+        //svg.selectAll("*").remove()
 
 
             /*d3.timer(function(elapsed) {
@@ -115,7 +118,9 @@ export default function Globe({data}:any): React.JSX.Element{
               
               const timer = setInterval(() => { getIssData()}, 1000)
               //console.log(issCords)
-              return () => clearInterval(timer)
+              return () => {
+                clearInterval(timer)
+            }
 
     },[data, projection, rotation])
 
