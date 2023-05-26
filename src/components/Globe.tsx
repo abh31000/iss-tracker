@@ -26,7 +26,7 @@ export default function Globe({data}:any): React.JSX.Element{
             .attr("stroke-width", "1px")
             .attr("cx", 400)
             .attr("cy", 330)
-            .attr('r',projection.scale())
+            .attr('r',300)
         
         
         function updatePP(){
