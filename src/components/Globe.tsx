@@ -25,7 +25,7 @@ export default function Globe({data}:any): React.JSX.Element{
             .then((res) => {
                 //console.log(res.data['latitude'], res.data['longitude'])
                 setIssCords([res.data['longitude'], res.data['latitude']])
-                setIssData(res.data)
+                //setIssData(res.data)
             })
             .catch((err) => {
                 console.log(err)
@@ -60,9 +60,9 @@ export default function Globe({data}:any): React.JSX.Element{
             const draw_circle = pathGenerator(circle)
             svg.select("#red-dot").remove()
             
+
             
-            //console.log(draw_circle)
-            //console.log(visible)
+            // Hides Tracker if it's behind earth's horizon
             if (draw_circle !== null){
             const iss = svg.append("circle")
                 .attr('id', "red-dot")
@@ -76,16 +76,18 @@ export default function Globe({data}:any): React.JSX.Element{
         d3.timer(updatePP)
 
         
-        const map = svg.append("g")
+        //const map = svg.append("g")
+
+        const center = [issCords[0] * -1, issCords[1] * -1]
 
         projection.translate([400,330])
         projection.scale(300)
-        projection.rotate([-150,0,0])
+        projection.rotate(center)
         const pathGenerator:any = geoPath(projection)
         svg.selectAll("path").attr("d", pathGenerator)
 
         // Drawing the globe        
-        map
+        svg
             //.attr("class", "countries")
             .selectAll("path")
             //.style("","")
@@ -99,6 +101,7 @@ export default function Globe({data}:any): React.JSX.Element{
             .style("opacity",0.6)
             
 
+
             /*d3.timer(function(elapsed) {
                 const rotate = projection.rotate()
                 const k = sensitivity / projection.scale()
@@ -111,7 +114,7 @@ export default function Globe({data}:any): React.JSX.Element{
               },200)*/
               
               const timer = setInterval(() => { getIssData()}, 1000)
-              console.log(issCords)
+              //console.log(issCords)
               return () => clearInterval(timer)
 
     },[data, projection, rotation])
@@ -119,9 +122,13 @@ export default function Globe({data}:any): React.JSX.Element{
    
     return(
         <>
+        <h1 className="mx-10 text-2xl mt-3 absolute">Current position of the ISS</h1>
+        <h1 className="absolute text-lg mx-10 mt-12">Latitude :  {issCords[0]}</h1>
+        <h1 className="absolute text-lg mx-10 mt-[70px]">Longitude :  {issCords[1]}</h1>
         <div className="h-full w-fit mx-auto">
         <svg width="800px" height="650px" className="" ref={svgRef}></svg>
         </div>
+
         </>
     )
 }
