@@ -69,14 +69,14 @@ export default function Globe({data}:any): React.JSX.Element{
                 .attr('id', "red-dot")
                 .attr('cx', x)
                 .attr('cy', y)
-                .attr('r', 3)
+                .attr('r', 4)
                 .attr('fill', 'red')
             }
         }
        
-
-        d3.timer(updatePP)
         svg.select("#red-dot").remove()
+        d3.timer(updatePP)
+        
         
         //const map = svg.append("g")
 
@@ -127,10 +127,12 @@ export default function Globe({data}:any): React.JSX.Element{
    
     return(
         <>
-        <h1 className="mx-10 text-2xl mt-3 absolute">Current position of the ISS</h1>
-        <h1 className="absolute text-lg mx-10 mt-12">Latitude :  {issCords[0]}</h1>
-        <h1 className="absolute text-lg mx-10 mt-[70px]">Longitude :  {issCords[1]}</h1>
-        <div className="h-full w-fit mx-auto">
+        <h1 className="absolute ml-[40vw] bg-white">Prototype (Project still unfinished)</h1>
+        <div className="h-2 w-2 rounded-full bg-red-600  mt-6 absolute ml-10"></div>
+        <h1 className="mx-14 absolute bg-white text-2xl mt-3 ">Current position of the ISS</h1>
+        <h1 className="text-lg absolute bg-white mx-10 mt-12">Latitude :  {issCords[0]}</h1>
+        <h1 className=" text-lg absolute bg-white mx-10 mt-[70px]">Longitude :  {issCords[1]}</h1>
+        <div className="h-full pt-3 w-fit mx-auto">
         <svg width="800px" height="650px" className="" ref={svgRef}></svg>
         </div>
 
