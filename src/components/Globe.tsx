@@ -4,32 +4,50 @@ import { useEffect } from "react"
 import { geoInterpolate, geoPath, path } from "d3"
 import axios from "axios"
 
-const client = axios.create({
+const iss_api = axios.create({
     baseURL: "https://api.wheretheiss.at/v1/satellites/25544"
 })
 
 
 export default function Globe({data}:any): React.JSX.Element{
     const [rotation, setRotation] = useState(0)
-    //const [issData, setIssData] = useState<any>()
+    const [issCords, setIssCords] = useState<[number, number]>([0,0])
+    const [alt, setAlt] = useState<number>(0)
+    const [location, setLocation] = useState("")
     const svgRef:any = useRef(null)
     const projection:any = d3.geoOrthographic()
     const sensitivity = 75
     //const issCord:any = [-14.599413, -28.673147]
     //const [issLat, setIssLat] = useState()
     //const [issLong, setIssLong] = useState()
-    const [issCords, setIssCords] = useState<[number, number]>([0,0])
 
     function getIssData() {
-        client.get("/")
+        iss_api.get("/")
             .then((res) => {
                 //console.log(res.data['latitude'], res.data['longitude'])
                 setIssCords([res.data['longitude'], res.data['latitude']])
+                setAlt(Math.trunc(res.data['altitude']))
                 //setIssData(res.data)
             })
             .catch((err) => {
                 console.log(err)
             })
+    }
+    function getLocation(lat:number, long:number) {
+        const API_ENDPOINT = `https://api.opencagedata.com/geocode/v1/json?key=${import.meta.env.VITE_OPEN_CAGE_API}&q=${lat}%2C${long}&pretty=1`
+        if (lat !==0 && long && long!==0){
+            const api = axios.get(API_ENDPOINT);
+            api
+                .then((res) => {
+                    if(res.data.results[0].components['_type'] === "body_of_water"){
+                        setLocation(res.data.results[0].components['body_of_water'])
+                    }
+                    else setLocation(res.data.results[0].components.country)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
     }
 
 
@@ -95,7 +113,7 @@ export default function Globe({data}:any): React.JSX.Element{
             //.style("","")
             .data(data.features)
             .enter().append("path")
-            //.attr("class", d => "country_" + d.properties.name.replace(" ","_"))
+            //.attr("id", d => d.properties.name)
             .attr("d", pathGenerator)
             .style("fill", "white")
             .style('stroke', 'black')
@@ -116,8 +134,9 @@ export default function Globe({data}:any): React.JSX.Element{
                 svg.selectAll("path").attr("d", pathGenerator)
               },200)*/
               
-              const timer = setInterval(() => { getIssData()}, 1000)
+              const timer = setInterval(() => { getIssData();getLocation(issCords[1], issCords[0])}, 1000)
               //console.log(issCords)
+              //console.log(location)
               return () => {
                 clearInterval(timer)
             }
@@ -132,6 +151,7 @@ export default function Globe({data}:any): React.JSX.Element{
         <h1 className="mx-14 absolute bg-white text-2xl mt-3 ">Current position of the ISS</h1>
         <h1 className="text-lg absolute bg-white mx-10 mt-12">Latitude :  {issCords[0]}</h1>
         <h1 className=" text-lg absolute bg-white mx-10 mt-[70px]">Longitude :  {issCords[1]}</h1>
+        <h1 className="mx-10 absolute text-lg bg-white mt-[110px]">{alt} Kilometers above : {location}</h1>
         <div className="h-full pt-3 w-fit mx-auto">
         <svg width="800px" height="650px" className="" ref={svgRef}></svg>
         </div>
