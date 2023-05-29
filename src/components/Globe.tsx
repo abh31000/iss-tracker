@@ -118,20 +118,20 @@ export default function Globe({ data }: any): React.JSX.Element {
 
   return (
     <>
-      <h1 className="absolute ml-[40vw] bg-white">
+      <h1 className="absolute font-[Helvetica] ml-[40vw] bg-white">
         Prototype (Project still unfinished)
       </h1>
       <div className="h-2 w-2 rounded-full bg-red-600  mt-6 absolute ml-10"></div>
-      <h1 className="mx-14 absolute bg-white text-2xl mt-3 ">
+      <h1 className="mx-14 font-[Helvetica] absolute bg-white text-2xl mt-3 ">
         Current position of the ISS
       </h1>
-      <h1 className="text-lg absolute bg-white mx-10 mt-12">
+      <h1 className="text-lg font-[Helvetica] absolute bg-white mx-10 mt-12">
         Latitude : {issCords[0]}
       </h1>
-      <h1 className=" text-lg absolute bg-white mx-10 mt-[70px]">
+      <h1 className=" text-lg font-[Helvetica] absolute bg-white mx-10 mt-[70px]">
         Longitude : {issCords[1]}
       </h1>
-      <h1 className="mx-10 absolute text-lg bg-white mt-[110px]">
+      <h1 className="mx-10 font-[Helvetica] absolute text-lg bg-white mt-[110px]">
         {alt} Kilometers above : {location}
       </h1>
       <div className="h-full pt-3 w-fit mx-auto">

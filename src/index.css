@@ -8,6 +8,7 @@
     stroke-width: 1px;
 }
 
-html {
-    
+@font-face {
+    font-family: Helvetica;
+    src: url("https://res.cloudinary.com/dbiudcrba/raw/upload/v1685365222/fonts/HelveticaNeueLTPro/HelveticaNeueLTProRoman_hi4txp.otf");
 }
