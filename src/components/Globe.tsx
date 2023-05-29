@@ -12,7 +12,8 @@ const iss_api = axios.create({
 export default function Globe({ data }: any): React.JSX.Element {
   const [issCords, setIssCords] = useState<[number, number]>([0, 0]);
   const [alt, setAlt] = useState<number>(0);
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState<string>("");
+  const [copy, setCopy] = useState<string>("")
   const svgRef: any = useRef(null);
   const projection: any = d3.geoOrthographic();
 
@@ -23,6 +24,7 @@ export default function Globe({ data }: any): React.JSX.Element {
       .then((res) => {
         setIssCords([res.data["longitude"], res.data["latitude"]]);
         setAlt(Math.trunc(res.data["altitude"]));
+        setCopy(`${res.data['latitude']}, ${res.data['longitude']}`)
       })
       .catch((err) => {
         console.log(err);
@@ -121,16 +123,22 @@ export default function Globe({ data }: any): React.JSX.Element {
       <h1 className="absolute font-[Helvetica] ml-[40vw] bg-white">
         Prototype (Project still unfinished)
       </h1>
-      <div className="h-2 w-2 rounded-full bg-red-600  mt-6 absolute ml-10"></div>
+      <div className="h-2 w-2 rounded-full bg-red-600  mt-5 absolute ml-10"></div>
       <h1 className="mx-14 font-[Helvetica] absolute bg-white text-2xl mt-3 ">
         Current position of the ISS
       </h1>
-      <h1 className="text-lg font-[Helvetica] absolute bg-white mx-10 mt-12">
-        Latitude : {issCords[0]}
-      </h1>
-      <h1 className=" text-lg font-[Helvetica] absolute bg-white mx-10 mt-[70px]">
-        Longitude : {issCords[1]}
-      </h1>
+      <div className="cursor-pointer group" onClick={()=> navigator.clipboard.writeText(copy)}>
+        <div className="cursor-auto select-none invisible group-hover:visible">
+          <div className="w-0 h-0 absolute top-16 left-[310px] border-t-[5px] border-t-transparent border-r-[10px] border-r-black border-b-[5px] border-b-transparent "></div>
+          <h1 className="absolute font-[Helvetica] text-sm text-white bg-black top-14 left-80 py-1 px-2">Click to copy to clipboard</h1>
+        </div>
+        <h1 className="text-lg font-[Helvetica] absolute bg-white mx-10 mt-12">
+        Latitude : {issCords[1]}
+        </h1>
+        <h1 className=" text-lg font-[Helvetica] absolute bg-white mx-10 mt-[70px]">
+          Longitude : {issCords[0]}
+        </h1>
+      </div>
       <h1 className="mx-10 font-[Helvetica] absolute text-lg bg-white mt-[110px]">
         {alt} Kilometers above : {location}
       </h1>
