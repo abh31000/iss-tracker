@@ -42,13 +42,21 @@ export default function Globe({ data }: any): React.JSX.Element {
         .then((res) => {
           if (res.data.results[0].components["_type"] === "body_of_water") {
             setLocation(res.data.results[0].components["body_of_water"]);
-          } else setLocation(res.data.results[0].components.country);
+          } else{
+              if (res.data.results[0].components.state){
+                setLocation(`${res.data.results[0].components.state}, ${res.data.results[0].components.country}`);
+              }
+              else setLocation(res.data.results[0].components.country)
+            }
         })
         .catch((err) => {
           console.log(err);
         });
     }
   }
+
+  getIssData();
+  getLocation(issCords[1], issCords[0]);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -60,7 +68,7 @@ export default function Globe({ data }: any): React.JSX.Element {
       .attr("fill", "#DDDDDD")
       .attr("stroke", "black")
       .attr("stroke-width", "1px")
-      .attr("cx", 400)
+      .attr("cx", 350)
       .attr("cy", 330)
       .attr("r", 300);
 
@@ -83,7 +91,7 @@ export default function Globe({ data }: any): React.JSX.Element {
     // Put red dot in the center of the map
     const center = [issCords[0] * -1, issCords[1] * -1];
 
-    projection.translate([400, 330]);
+    projection.translate([350, 330]);
     projection.scale(300);
 
     // Rotate earth around that red dot
@@ -120,31 +128,36 @@ export default function Globe({ data }: any): React.JSX.Element {
 
   return (
     <>
-      <h1 className="absolute font-[Helvetica] ml-[40vw] bg-white">
-        Prototype (Project still unfinished)
-      </h1>
-      <div className="h-2 w-2 rounded-full bg-red-600  mt-5 absolute ml-10"></div>
-      <h1 className="mx-14 font-[Helvetica] absolute bg-white text-2xl mt-3 ">
-        Current position of the ISS
-      </h1>
-      <div className="cursor-pointer group" onClick={()=> navigator.clipboard.writeText(copy)}>
-        <div className="cursor-auto select-none invisible group-hover:visible">
-          <div className="w-0 h-0 absolute top-16 left-[310px] border-t-[5px] border-t-transparent border-r-[10px] border-r-black border-b-[5px] border-b-transparent "></div>
-          <h1 className="absolute font-[Helvetica] text-sm text-white bg-black top-14 left-80 py-1 px-2">Click to copy to clipboard</h1>
+      <h1 className="font-[Helvetica] text-lg -mb-10 select-none py-2 text-center ">ISS Tracker - By Abdelkhalek Boukli Hacene</h1>
+
+      <div className="font-[Helvetica] grid grid-rows-2 grid-flow-col justify-items-center">
+        <div className="w-full mt-4">
+          <div className="py-8 -mb-2 mx-16 flex">
+            <div className="h-2 w-2 mt-2 mr-2 my-auto rounded-full bg-red-600"></div>
+            <h1 className="text-2xl">Current position of the ISS</h1>
+          </div>
+
+          <div className="flex-col mx-16 ">
+            <div className="cursor-pointer group w-fit" onClick={()=> navigator.clipboard.writeText(copy)}>
+              <div className="cursor-auto left-[340px] my-2 w-fit absolute flex select-none invisible group-hover:visible">
+                  <div className="w-0 h-0 my-2 border-t-[5px] border-t-transparent border-r-[10px] border-r-black border-b-[5px] border-b-transparent "></div>
+                  <h1 className="text-sm text-white bg-black w-fit py-1 px-2">Click to copy to clipboard</h1>
+              </div>
+
+              <h1 className="text-lg">Latitude : {issCords[1]}</h1>
+              <h1 className="text-lg">Longitude : {issCords[0]}</h1>
+            </div>
+
+            <h1 className="mt-3 text-lg">{alt} Kilometers above : {location}</h1>
+          </div>
         </div>
-        <h1 className="text-lg font-[Helvetica] absolute bg-white mx-10 mt-12">
-        Latitude : {issCords[1]}
-        </h1>
-        <h1 className=" text-lg font-[Helvetica] absolute bg-white mx-10 mt-[70px]">
-          Longitude : {issCords[0]}
-        </h1>
+
+        <div className=" w-fit h-fit row-span-2 ">
+          <svg width="700px" height="640px" className="" ref={svgRef}></svg>
+        </div>
       </div>
-      <h1 className="mx-10 font-[Helvetica] absolute text-lg bg-white mt-[110px]">
-        {alt} Kilometers above : {location}
-      </h1>
-      <div className="h-full pt-3 w-fit mx-auto">
-        <svg width="800px" height="650px" className="" ref={svgRef}></svg>
-      </div>
+
+      
     </>
   );
 }
