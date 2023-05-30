@@ -128,7 +128,6 @@ export default function Globe({ data }: any): React.JSX.Element {
 
   return (
     <>
-      <h1 className="font-[Helvetica] text-lg -mb-10 select-none py-2 text-center ">ISS Tracker - By Abdelkhalek Boukli Hacene</h1>
 
       <div className="font-[Helvetica] grid grid-rows-2 grid-flow-col justify-items-center">
         <div className="w-full mt-4">
