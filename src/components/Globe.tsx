@@ -42,13 +42,21 @@ export default function Globe({ data }: any): React.JSX.Element {
         .then((res) => {
           if (res.data.results[0].components["_type"] === "body_of_water") {
             setLocation(res.data.results[0].components["body_of_water"]);
-          } else setLocation(res.data.results[0].components.country);
+          } else{
+              if (res.data.results[0].components.state){
+                setLocation(`${res.data.results[0].components.state}, ${res.data.results[0].components.country}`);
+              }
+              else setLocation(res.data.results[0].components.country)
+            }
         })
         .catch((err) => {
           console.log(err);
         });
     }
   }
+
+  getIssData();
+  getLocation(issCords[1], issCords[0]);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -120,17 +128,16 @@ export default function Globe({ data }: any): React.JSX.Element {
 
   return (
     <>
-
-<h1 className="font-[Helvetica] -mb-6 py-2 text-center ">PLACEHOLDER LOGO</h1>
+      <h1 className="font-[Helvetica] text-lg -mb-10 select-none py-2 text-center ">ISS Tracker - By Abdelkhalek Boukli Hacene</h1>
 
       <div className="font-[Helvetica] grid grid-rows-2 grid-flow-col justify-items-center">
         <div className="w-full mt-4">
-          <div className="py-10 -mb-2 px-16 flex">
+          <div className="py-8 -mb-2 mx-16 flex">
             <div className="h-2 w-2 mt-2 mr-2 my-auto rounded-full bg-red-600"></div>
             <h1 className="text-2xl">Current position of the ISS</h1>
           </div>
 
-          <div className="flex-col px-16 ">
+          <div className="flex-col mx-16 ">
             <div className="cursor-pointer group w-fit" onClick={()=> navigator.clipboard.writeText(copy)}>
               <div className="cursor-auto left-[340px] my-2 w-fit absolute flex select-none invisible group-hover:visible">
                   <div className="w-0 h-0 my-2 border-t-[5px] border-t-transparent border-r-[10px] border-r-black border-b-[5px] border-b-transparent "></div>
@@ -141,7 +148,7 @@ export default function Globe({ data }: any): React.JSX.Element {
               <h1 className="text-lg">Longitude : {issCords[0]}</h1>
             </div>
 
-            <h1 className="] mt-5 text-lg">{alt} Kilometers above : {location}</h1>
+            <h1 className="mt-3 text-lg">{alt} Kilometers above : {location}</h1>
           </div>
         </div>
 
