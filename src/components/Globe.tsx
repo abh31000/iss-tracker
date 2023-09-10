@@ -3,6 +3,9 @@ import * as d3 from "d3";
 import { useEffect } from "react";
 import { geoInterpolate, geoPath, path } from "d3";
 import axios from "axios";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useToast } from "@/components/ui/use-toast"
+import { Toaster } from "@/components/ui/toaster"
 
 // ISS Coordinates API
 const iss_api = axios.create({
@@ -13,9 +16,10 @@ export default function Globe({ data }: any): React.JSX.Element {
   const [issCords, setIssCords] = useState<[number, number]>([0, 0]);
   const [alt, setAlt] = useState<number>(0);
   const [location, setLocation] = useState<string>("");
-  const [copy, setCopy] = useState<string>("")
+  const [copy, setCopy] = useState<string>("0, 0")
   const svgRef: any = useRef(null);
   const projection: any = d3.geoOrthographic();
+  const { toast } = useToast()
 
   // Getting the ISS Coordinates
   function getIssData() {
@@ -27,9 +31,21 @@ export default function Globe({ data }: any): React.JSX.Element {
         setCopy(`${res.data['latitude']}, ${res.data['longitude']}`)
       })
       .catch((err) => {
-        console.log(err);
+        //console.log(err);
+        /*toast({
+          variant: "destructive",
+          description: `${err}`,
+        })*/
       });
   }
+
+  // Copy coordinates to clipboard
+  function copyClipBoard() {
+    navigator.clipboard.writeText(copy);
+    toast({
+      description: "Copied coordinates to your clipboard"
+    })
+  } 
 
   // GeoCoding API, get the ISS current location
   function getLocation(lat: number, long: number) {
@@ -55,8 +71,8 @@ export default function Globe({ data }: any): React.JSX.Element {
     }
   }
 
-  getIssData();
-  getLocation(issCords[1], issCords[0]);
+  //getIssData();
+  //getLocation(issCords[1], issCords[0]);
 
   useEffect(() => {
     const svg = d3.select(svgRef.current);
@@ -119,7 +135,7 @@ export default function Globe({ data }: any): React.JSX.Element {
     const timer = setInterval(() => {
       getIssData();
       getLocation(issCords[1], issCords[0]);
-    }, 1000);
+    }, 1500);
     //console.log(location)
     return () => {
       clearInterval(timer);
@@ -137,14 +153,19 @@ export default function Globe({ data }: any): React.JSX.Element {
           </div>
 
           <div className="flex-col mx-16 ">
-            <div className="cursor-pointer group w-fit" onClick={()=> navigator.clipboard.writeText(copy)}>
-              <div className="cursor-auto left-[340px] my-2 w-fit absolute flex select-none invisible group-hover:visible">
-                  <div className="w-0 h-0 my-2 border-t-[5px] border-t-transparent border-r-[10px] border-r-black border-b-[5px] border-b-transparent "></div>
-                  <h1 className="text-sm text-white bg-black w-fit py-1 px-2">Click to copy to clipboard</h1>
-              </div>
+            <div className="cursor-pointer w-fit" onClick={copyClipBoard}>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <h1 className="text-lg text-start">Latitude : {issCords[1]}</h1>
+                    <h1 className="text-lg text-start">Longitude : {issCords[0]}</h1>
+                  </TooltipTrigger>
+                  <TooltipContent side="left" className="select-none ml-2">Click to copy to clipboard</TooltipContent>
+                </Tooltip>
+                
+                
+              </TooltipProvider>
 
-              <h1 className="text-lg">Latitude : {issCords[1]}</h1>
-              <h1 className="text-lg">Longitude : {issCords[0]}</h1>
             </div>
 
             <h1 className="mt-3 text-lg">{alt} Kilometers above : {location}</h1>
@@ -155,7 +176,7 @@ export default function Globe({ data }: any): React.JSX.Element {
           <svg width="700px" height="640px" className="" ref={svgRef}></svg>
         </div>
       </div>
-
+      <Toaster />
       
     </>
   );
