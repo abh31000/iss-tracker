@@ -20,6 +20,9 @@ export default function Globe({ data }: any): React.JSX.Element {
   const svgRef: any = useRef(null);
   const projection: any = d3.geoOrthographic();
   const { toast } = useToast()
+  const sensitivity = 75
+
+  const [rotation, setRotation] = useState(0)
 
   // Getting the ISS Coordinates
   function getIssData() {
@@ -52,7 +55,7 @@ export default function Globe({ data }: any): React.JSX.Element {
     const API_ENDPOINT = `https://api.opencagedata.com/geocode/v1/json?key=${
       import.meta.env.VITE_OPEN_CAGE_API
     }&q=${lat}%2C${long}&pretty=1`;
-    if (lat !== 0 && long && long !== 0) {
+    if (lat !== 0 && long !== 0) {
       const api = axios.get(API_ENDPOINT);
       api
         .then((res) => {
@@ -66,7 +69,7 @@ export default function Globe({ data }: any): React.JSX.Element {
             }
         })
         .catch((err) => {
-          console.log(err);
+          //console.log(err);
         });
     }
   }
@@ -77,6 +80,8 @@ export default function Globe({ data }: any): React.JSX.Element {
   useEffect(() => {
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
+    const speed = 0.004
+    //setRotation(speed * performance.now())
 
     // Background circle for earth
     const globe = svg
@@ -88,10 +93,13 @@ export default function Globe({ data }: any): React.JSX.Element {
       .attr("cy", 330)
       .attr("r", 300);
 
+    
+
     // Draw the red dot(ISS current position) on the map
     function updatePP() {
       const [x, y]: any = projection(issCords);
       const circleGenerator = d3.geoCircle().center(issCords).radius(3);
+      
 
       const iss = svg
         .append("circle")
@@ -101,20 +109,32 @@ export default function Globe({ data }: any): React.JSX.Element {
         .attr("r", 4)
         .attr("fill", "red");
     }
-    svg.select("#red-dot").remove()
-    d3.timer(updatePP);
+    //svg.select("#red-dot").remove()
+    //d3.timer(updatePP);
 
     // Put red dot in the center of the map
-    const center = [issCords[0] * -1, issCords[1] * -1];
+    //const center = [issCords[0] * -1, issCords[1] * -1];
 
     projection.translate([350, 330]);
     projection.scale(300);
+    //projection.rotate([rotation,0,0])
 
     // Rotate earth around that red dot
-    projection.rotate(center);
-
+    //projection.rotate(center);
     const pathGenerator: any = geoPath(projection);
-    svg.selectAll("path").attr("d", pathGenerator);
+    //svg.selectAll("path").attr("d", pathGenerator)
+
+    svg.call(d3.drag().on("drag", (event)=>{
+      const rotate = projection.rotate();
+      const k = sensitivity / projection.scale();
+
+      projection.rotate([
+        rotate[0] + event.dx * k,
+        rotate[1] - event.dy * k,
+      ])
+      const pathGenerator: any = geoPath(projection);
+      svg.selectAll("path").attr("d", pathGenerator)
+    }))
 
     // Drawing the globe
     svg
@@ -129,7 +149,7 @@ export default function Globe({ data }: any): React.JSX.Element {
       .style("fill", "white")
       .style("stroke", "black")
       .style("stroke-width", 0.5)
-      .style("opacity", 0.6);
+      .style("opacity", 0.6)
 
     // API calls every second
     const timer = setInterval(() => {
@@ -140,7 +160,7 @@ export default function Globe({ data }: any): React.JSX.Element {
     return () => {
       clearInterval(timer);
     };
-  }, [data, projection]);
+  }, [data]);
 
   return (
     <>
